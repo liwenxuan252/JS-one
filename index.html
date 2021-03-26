@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <div class="wrapper">
+        <ul class="slider-page">
+            <li>
+                <img src="./cat1.jpg" alt="">
+            </li>
+            <li>
+                <img src="./cat2.jpg" alt="">
+            </li>
+            <li>
+                <img src="./cat3.jpg" alt="">
+            </li>
+            <li>
+                <img src="./cat4.jpg" alt="">
+            </li>
+            <li>
+                <img src="./cat1.jpg" alt="">
+            </li>
+        </ul>
+        <div class="btn leftBtn">&lt;</div>
+        <div class="btn rightBtn">&gt;</div>
+        <div class="slider-index">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    <script src="./move.js"></script>
+    <script>
+        var timer = null;
+        var ul = document.getElementsByClassName('slider-page')[0];
+        var num = ul.children.length - 1;
+        var moveWidth = document.getElementsByTagName('li')[0].offsetWidth;
+        var leftBtn = document.getElementsByClassName('leftBtn')[0];
+        var rightBtn = document.getElementsByClassName('rightBtn')[0];
+        var pageIndex = document.getElementsByTagName('span');
+        var lock = true;
+        var index = 0;
+        console.log(pageIndex)
+        leftBtn.onclick = function(){
+            autoMove("right->left");
+        }
+        rightBtn.onclick = function(){
+            autoMove();
+        }
+
+        for(let i = 0;i<pageIndex.length;i++){
+            pageIndex[i].onclick = function(){
+                    lock = false;
+                    clearTimeout(timer);
+                    startMove(ul,{left:-i * moveWidth},function(){
+                        index = i;
+                        lock = true;
+                        changeIndex(index);
+                        timer = setTimeout(autoMove,1500)
+                    })
+            }
+        }
+
+
+        //direction 不传递默认自左向右
+        function autoMove(direction){
+            if(lock){
+                lock = false;
+                clearTimeout(timer)
+                if(!direction || direction == 'left->right'){
+                    startMove(ul,{left:ul.offsetLeft - moveWidth},function(){         
+                        if(ul.offsetLeft === -num * moveWidth){
+                            ul.style.left = "0px";
+                            index = -1;
+                            // changeIndex(index);
+                        }
+                        lock = true;
+                        index++;
+                        changeIndex(index);
+                        timer = setTimeout(autoMove,1500);
+                        
+                    });
+                    
+                    
+                }
+                else if(direction == 'right->left'){
+                    if(ul.offsetLeft === 0){
+                        ul.style.left = -num * moveWidth + "px";
+                        index = num;
+                    }
+
+                    startMove(ul,{left:ul.offsetLeft + moveWidth},function(){
+                        lock = true;
+                        index--;
+                        changeIndex(index);
+                        timer = setTimeout(autoMove,1500);
+                        
+                    })
+                    
+                    
+                }
+                }
+        }
+        function changeIndex(_index){
+            for(let i = 0;i<pageIndex.length;i++){
+                pageIndex[i].className = '';
+            }
+            pageIndex[_index].className = 'active';
+        }
+
+        timer = setTimeout(autoMove,1500);
+    </script>
+</body>
+</html>
